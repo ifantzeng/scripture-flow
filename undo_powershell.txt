@@ -1,0 +1,35 @@
+解鎖 PowerShell 執行權限
+請按照以下步驟操作：
+
+以管理員身分執行 PowerShell：
+
+點擊 Windows 開始功能表，搜尋 PowerShell。
+
+在 Windows PowerShell 上按右鍵，選擇 「以系統管理員身分執行」。
+
+輸入解鎖指令： 在跳出的藍色視窗中，輸入以下指令並按 Enter：
+
+PowerShell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+確認變更：
+
+系統會詢問是否要變更原則，請輸入 Y 然後按 Enter。
+
+======================================================
+
+上鎖 PowerShell 執行權限
+請按照以下步驟操作：
+
+以管理員身分執行 PowerShell：
+
+點擊 Windows 開始功能表，搜尋 PowerShell。
+
+在 Windows PowerShell 上按右鍵，選擇 「以系統管理員身分執行」。
+
+輸入解鎖指令： 在跳出的藍色視窗中，輸入以下指令並按 Enter：
+
+PowerShell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+確認變更：
+
+系統會詢問是否要變更原則，請輸入 N 然後按 Enter。
