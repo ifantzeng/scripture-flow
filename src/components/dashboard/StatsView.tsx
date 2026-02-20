@@ -4,9 +4,9 @@ import { useMemo, useState, useRef } from "react";
 import { BIBLE_BOOKS } from "@/lib/bible-data";
 import { calculateBibleStats } from "@/lib/stats-helper";
 import { 
-  Calendar, Info, TrendingUp, Bookmark, Camera, 
-  Loader2, Quote, PenLine, CheckCircle2, 
-  Share2, Download, BarChart3 
+  Calendar, TrendingUp, Bookmark, Camera, 
+  Loader2, Quote, PenLine, 
+  Share2 
 } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { toPng } from 'html-to-image';
@@ -28,8 +28,12 @@ const BIBLE_CATEGORIES = {
   ]
 };
 
+interface Reading {
+  [key: string]: unknown;
+}
+
 interface StatsViewProps {
-  readings: any[];
+  readings: Reading[];
   viewMode?: 'SHARE_ONLY' | 'STATS_ONLY';
 }
 
@@ -203,13 +207,13 @@ export default function StatsView({ readings, viewMode = 'STATS_ONLY' }: StatsVi
              {(showGoldenVerse || showInsights) && (
                 <div className="pt-8 border-t border-slate-100 space-y-6">
                     {showGoldenVerse && goldenVerse && (
-                        <div className="relative p-8 bg-amber-50/30 rounded-[32px] border border-amber-100/50">
+                        <div className="relative p-8 bg-amber-50/30 rounded-4xl border border-amber-100/50">
                             <Quote className="absolute top-4 left-4 h-8 w-8 text-amber-200" />
                             <p className="text-xl font-serif text-slate-800 leading-relaxed text-center px-4 italic">「{goldenVerse}」</p>
                         </div>
                     )}
                     {showInsights && insights && (
-                        <div className="p-8 bg-slate-50/50 rounded-[32px] border border-slate-100/50">
+                        <div className="p-8 bg-slate-50/50 rounded-4xl border border-slate-100/50">
                             <div className="flex items-center gap-2 mb-3 text-slate-400">
                                 <PenLine size={14} />
                                 <span className="text-[10px] font-black uppercase tracking-widest">靈修領受</span>
@@ -230,7 +234,7 @@ export default function StatsView({ readings, viewMode = 'STATS_ONLY' }: StatsVi
             <h3 className="font-bold text-xl text-gray-800 mb-8 flex items-center gap-3">
                 <TrendingUp className="h-6 w-6 text-blue-600" /> 近 30 天閱讀動力趨勢
             </h3>
-            <div className="h-[280px] w-full">
+            <div className="h-70 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={stats.trendData}>
                         <defs>
