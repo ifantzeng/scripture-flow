@@ -12,7 +12,7 @@ export const BIBLE_ID_MAP: Record<string, string> = {
   "西番雅書": "ZEP", "哈該書": "HAG", "撒迦利亞書": "ZEC", "瑪拉基書": "MAL",
   "馬太福音": "MAT", "馬可福音": "MRK", "路加福音": "LUK", "約翰福音": "JHN", "使徒行傳": "ACT",
   "羅馬書": "ROM", "哥林多前書": "1CO", "哥林多後書": "2CO", "加拉太書": "GAL", "以弗所書": "EPH",
-  "腓立比書": "PHP", "哥羅西書": "COL", "帖撒羅尼迦前書": "1TH", "帖撒羅尼迦後書": "2TH",
+  "腓立比書": "PHP", "歌羅西書": "COL", "帖撒羅尼迦前書": "1TH", "帖撒羅尼迦後書": "2TH",
   "提摩太前書": "1TI", "提摩太後書": "2TI", "提多書": "TIT", "腓利門書": "PHM", "希伯來書": "HEB",
   "雅各書": "JAS", "彼得前書": "1PE", "彼得後書": "2PE", "約翰一書": "1JN", "約翰二書": "2JN",
   "約翰三書": "3JN", "猶大書": "JUD", "啟示錄": "REV"
@@ -56,3 +56,45 @@ export function getBibleApiUrl(scripture: string) {
   if (!englishId) return null;
   return `https://bible-api.com/${englishId}+${chapterRange}?translation=cuv`;
 }
+
+// ⭐ 智慧解析器：將長字串拆分成不同的書卷群組，並產生對應的連結用字串
+export const parseScriptureGroups = (text: string) => {
+  if (!text) return [];
+  const chapters = text.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+  if (chapters.length === 0) return [];
+
+  const groups: { display: string, linkQuery: string }[] = [];
+  let currentBook = "";
+  let startChapter = "";
+  let lastChapter = "";
+
+  chapters.forEach((chap, index) => {
+    // 自動拆分「中文書卷」與「數字」
+    const match = chap.match(/^([^\d]+)\s*(\d+.*)$/);
+    const book = match ? match[1].trim() : chap;
+    const num = match ? match[2].trim() : "";
+
+    if (book !== currentBook) {
+      if (currentBook) {
+         groups.push({
+             display: startChapter === lastChapter ? `${currentBook} ${startChapter}` : `${currentBook} ${startChapter}~${lastChapter}`,
+             linkQuery: `${currentBook} ${startChapter}`
+         });
+      }
+      currentBook = book;
+      startChapter = num;
+      lastChapter = num;
+    } else {
+      lastChapter = num;
+    }
+
+    if (index === chapters.length - 1) {
+       groups.push({
+           display: startChapter === lastChapter ? `${currentBook} ${startChapter}` : `${currentBook} ${startChapter}~${lastChapter}`,
+           linkQuery: `${currentBook} ${startChapter}`
+       });
+    }
+  });
+
+  return groups;
+};
