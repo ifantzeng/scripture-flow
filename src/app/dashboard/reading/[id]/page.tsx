@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { getExternalBibleLink } from "@/lib/bible-lookup";
+import { getExternalBibleLink, parseScriptureGroups } from "@/lib/bible-lookup";
 import { ArrowLeft, CheckCircle2, Loader2, ExternalLink, BookOpen } from "lucide-react";
 
 interface PlanReading {
@@ -12,48 +12,6 @@ interface PlanReading {
   is_completed: boolean;
   [key: string]: unknown;
 }
-
-// ⭐ 智慧解析器：將長字串拆分成不同的書卷群組，並產生對應的連結用字串
-const parseScriptureGroups = (text: string) => {
-  if (!text) return [];
-  const chapters = text.split(/[,，]/).map(s => s.trim()).filter(Boolean);
-  if (chapters.length === 0) return [];
-
-  const groups: { display: string, linkQuery: string }[] = [];
-  let currentBook = "";
-  let startChapter = "";
-  let lastChapter = "";
-
-  chapters.forEach((chap, index) => {
-    // 自動拆分「中文書卷」與「數字」
-    const match = chap.match(/^([^\d]+)\s*(\d+.*)$/);
-    const book = match ? match[1].trim() : chap;
-    const num = match ? match[2].trim() : "";
-
-    if (book !== currentBook) {
-      if (currentBook) {
-         groups.push({
-             display: startChapter === lastChapter ? `${currentBook} ${startChapter}` : `${currentBook} ${startChapter}~${lastChapter}`,
-             linkQuery: `${currentBook} ${startChapter}` // ⭐ 連結永遠指向該群組的第一章
-         });
-      }
-      currentBook = book;
-      startChapter = num;
-      lastChapter = num;
-    } else {
-      lastChapter = num;
-    }
-
-    if (index === chapters.length - 1) {
-       groups.push({
-           display: startChapter === lastChapter ? `${currentBook} ${startChapter}` : `${currentBook} ${startChapter}~${lastChapter}`,
-           linkQuery: `${currentBook} ${startChapter}`
-       });
-    }
-  });
-
-  return groups;
-};
 
 export default function ReadingPage() {
   return (

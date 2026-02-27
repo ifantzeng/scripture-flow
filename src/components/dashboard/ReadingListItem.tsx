@@ -3,73 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ChevronDown, ChevronUp, BookOpen, ExternalLink, Share2, Check } from "lucide-react";
-
-const BOOK_CODES: Record<string, string> = {
-  "創世記": "GEN", "出埃及記": "EXO", "利未記": "LEV", "民數記": "NUM", "申命記": "DEU",
-  "約書亞記": "JOS", "士師記": "JDG", "路得記": "RUT", "撒母耳記上": "1SA", "撒母耳記下": "2SA",
-  "列王紀上": "1KI", "列王紀下": "2KI", "歷代志上": "1CH", "歷代志下": "2CH", "以斯拉記": "EZR",
-  "尼希米記": "NEH", "以斯帖記": "EST", "約伯記": "JOB", "詩篇": "PSA", "箴言": "PRO",
-  "傳道書": "ECC", "雅歌": "SNG", "以賽亞書": "ISA", "耶利米書": "JER", "耶利米哀歌": "LAM",
-  "以西結書": "EZK", "但以理書": "DAN", "何西阿書": "HOS", "約珥書": "JOL", "阿摩司書": "AMO",
-  "俄巴底亞書": "OBA", "約拿書": "JON", "彌迦書": "MIC", "那鴻書": "NAM", "哈巴谷書": "HAB",
-  "西番雅書": "ZEP", "哈該書": "HAG", "撒迦利亞書": "ZEC", "瑪拉基書": "MAL",
-  "馬太福音": "MAT", "馬可福音": "MRK", "路加福音": "LUK", "約翰福音": "JHN", "使徒行傳": "ACT",
-  "羅馬書": "ROM", "哥林多前書": "1CO", "哥林多後書": "2CO", "加拉太書": "GAL", "以弗所書": "EPH",
-  "腓立比書": "PHP", "歌羅西書": "COL", "帖撒羅尼迦前書": "1TH", "帖撒羅尼迦後書": "2TH",
-  "提摩太前書": "1TI", "提摩太後書": "2TI", "提多書": "TIT", "腓利門書": "PHM", "希伯來書": "HEB",
-  "雅各書": "JAS", "彼得前書": "1PE", "彼得後書": "2PE", "約翰一書": "1JN", "約翰二書": "2JN",
-  "約翰三書": "3JN", "猶大書": "JUD", "啟示錄": "REV"
-};
-
-const getExternalBibleLink = (query: string) => {
-  const parts = query.trim().split(/\s+/);
-  if (parts.length < 2) return `https://www.bible.com/bible/46/GEN.1.CUNP-神`; 
-  const bookName = parts[0];
-  const startChapter = parseInt(parts[1]) || 1; 
-  const bookCode = BOOK_CODES[bookName] || "GEN";
-  return `https://www.bible.com/bible/46/${bookCode}.${startChapter}.CUNP-神`;
-};
-
-// ⭐ 升級版：不但產生縮寫標題，還能輸出分組資料供按鈕使用
-const parseScriptureGroups = (text: string) => {
-  if (!text) return [];
-  const chapters = text.split(/[,，]/).map(s => s.trim()).filter(Boolean);
-  if (chapters.length === 0) return [];
-
-  const groups: { display: string, linkQuery: string }[] = [];
-  let currentBook = "";
-  let startChapter = "";
-  let lastChapter = "";
-
-  chapters.forEach((chap, index) => {
-    const match = chap.match(/^([^\d]+)\s*(\d+.*)$/);
-    const book = match ? match[1].trim() : chap;
-    const num = match ? match[2].trim() : "";
-
-    if (book !== currentBook) {
-      if (currentBook) {
-         groups.push({
-             display: startChapter === lastChapter ? `${currentBook} ${startChapter}` : `${currentBook} ${startChapter}~${lastChapter}`,
-             linkQuery: `${currentBook} ${startChapter}`
-         });
-      }
-      currentBook = book;
-      startChapter = num;
-      lastChapter = num;
-    } else {
-      lastChapter = num;
-    }
-
-    if (index === chapters.length - 1) {
-       groups.push({
-           display: startChapter === lastChapter ? `${currentBook} ${startChapter}` : `${currentBook} ${startChapter}~${lastChapter}`,
-           linkQuery: `${currentBook} ${startChapter}`
-       });
-    }
-  });
-
-  return groups;
-};
+import { parseScriptureGroups, getExternalBibleLink } from "@/lib/bible-lookup";
 
 interface Reading {
   id: number;
