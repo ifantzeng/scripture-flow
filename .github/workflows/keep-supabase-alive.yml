@@ -1,0 +1,24 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    # 設定排程：每天台灣時間早上 8 點 (UTC 0) 自動執行一次
+    - cron: '0 0 * * *'
+  workflow_dispatch: # 保留一個按鈕，讓您可以隨時手動點擊測試
+
+jobs:
+  ping-database:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 喚醒 Supabase API
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          echo "開始發送喚醒請求至 Supabase..."
+          # 透過 API 隨便跟資料庫要 1 筆計畫的 ID，產生真實的讀取動作
+          curl -X GET "${SUPABASE_URL}/rest/v1/plans?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            -H "Content-Profile: public"
+          echo -e "\n喚醒請求發送完畢！"
